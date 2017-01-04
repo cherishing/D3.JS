@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+<script src="d3.js"></script>
+<script>
+var width = 800;
+var height = 400;
+var svg = d3.select("body").append("svg")
+		.attr("width", width)
+		.attr("height", height);
+
+var dataset = [10, 30,35,55,12];
+//1、布局（数据转换）
+var pie = d3.layout.pie();		//定义一个pie布局，返回值赋给变量pie
+var piedata = pie(dataset);		//piedata就是转换后的数据
+
+//2、绘制图形
+var innerRadius = 0;		//内半径为0，则中间没有空白
+var outerRadius = 100;
+var arc = d3.svg.arc()		//弧生成器
+		.innerRadius(innerRadius)		//设置内半径
+		.outerRadius(outerRadius);		//设置外半径
+
+var arcs = svg.selectAll("g")
+		.data(piedata)
+		.enter()
+		.append("g")
+		.attr("transform", "translate("+(width/2)+","+(height/2)+")");
+
+var color = d3.scale.category10();		//有十种颜色的颜色比例尺
+arcs.append("path")
+	.attr("fill", function(d, i){
+		return color(i);
+	})
+	.attr("d", function(d){
+		console.log(d);
+		console.log(arc(d));
+		return arc(d);				//调用弧生成器，得到路径
+	});
+arcs.append("text")
+	.attr("transform", function(d){
+		return "translate("+arc.centroid(d)+")";   		//arc.centroid是计算中弧线的中心
+	})
+	.text(function(d){
+		return d.data;
+	})
+	.attr("text-anchor", "middle")
+	.attr("fill", "#fff")
+	.attr("font-weight", "bold");
+
+</script>
+</body>
+</html>

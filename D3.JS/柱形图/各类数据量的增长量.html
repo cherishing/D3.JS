@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+	*{margin:0; padding:0;}
+	body{background:#000;}
+	.x-axis,.y-axis > line, path, text{fill:none; stroke:#fff;}
+	.x-axis,.y-axis > text{text-anchor:middle;}
+	</style>
+</head>
+<body>
+<script src="d3.js"></script>
+<script>
+
+var dataset = {
+	type: ["涉黄", "涉恐", "涉暴", "涉毒", "其他涉案"],
+	total: [77, 34, 45, 22, 60]
+};
+// 1、定义画布
+var width = 400;
+var height = 400;
+var viewBox = [0 ,0, 400, 400];
+var padding = {left:40, right:40, top:20, bottom:20}; //画布四周的空白
+var svg = d3.select("body").append("svg")
+		.attr("viewBox", viewBox)
+		.attr("width", width)
+		.attr("height", height);
+//2、定义比例尺
+var xScale = d3.scale.ordinal()					//定义序数比例尺
+		.domain(d3.range(dataset.type.length))
+		.rangeRoundBands([0, width-padding.left-padding.right]);
+var yScale = d3.scale.linear()					//定义线性比例尺
+		.domain([0, d3.max(dataset.total)])
+		.range([height - padding.top - padding.bottom, 0]);
+
+//3、定义x轴和y轴
+var xAxis = d3.svg.axis()
+		.scale(xScale)
+		.orient("bottom");
+var yAxis = d3.svg.axis()
+		.scale(yScale)
+		.orient("left");
+//4、添加坐标轴元素
+var x = svg.append("g")				//x轴
+	.attr("class", "x-axis")
+	.attr("transform", "translate("+padding.left+","+(height-padding.bottom-10)+")")
+	.call(xAxis);
+
+d3.selectAll(".x-axis").selectAll("line")		//去掉x轴上的刻度标记
+	.attr("y2", 0);
+d3.select(".x-axis").select(".domain")		
+	.attr("d", "M0,0V0H340V0");
+var allText = d3.selectAll(".x-axis").selectAll("text");	//x轴换成文字坐标
+allText.each(function(i){
+	d3.select(this).text(dataset.type[i]);
+});
+
+var y = svg.append("g")
+	.attr("class", "y-axis")
+	.attr("transform", "translate("+padding.left+","+(padding.top-10)+")")
+	.call(yAxis);
+d3.selectAll(".y-axis").selectAll("line")		//去掉y轴上的刻度标记
+	.attr("x2", 0);
+d3.selectAll(".y-axis").select(".domain").remove();		//删除y轴path
+
+d3.select(".y-axis").selectAll(".tick").append("line")
+		.attr("x1", 0)
+		.attr("x2", 340)
+		.attr("stroke-width","1")
+		.attr("stroke", "rgba(255,255,255,.5)");
+
+//添加矩形元素
+var rectPadding = 20;
+var rects = svg.selectAll(".myRect")
+		.data(dataset.total)
+		.enter()
+		.append("rect")
+		.attr("attr", "myRect")
+		.attr("x", function(d, i){
+			return xScale(i)+rectPadding/2;
+		})
+		.attr("y", function(d){
+			return yScale(d);
+		})
+		.attr("width", xScale.rangeBand()-rectPadding)
+		.attr("height", function(d){
+			return height-padding.top-padding.bottom-yScale(d)-10;
+		})
+		.attr("transform", "translate("+padding.left+","+(padding.top-1)+")")
+		.attr("fill", "rgba(0, 220, 255, 0.8)")
+		.attr("opacity", ".6")
+		.on("mouseover", function(){
+			d3.select(this).attr("opacity", "1");
+		})
+		.on("mouseout", function(){
+			d3.select(this).attr("opacity", ".8");
+		});
+
+</script>
+</body>
+</html>

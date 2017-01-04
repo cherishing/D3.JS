@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="d3.js"></script>
+</head>
+<body>
+<div id="div1"></div>
+<script>
+// var linear = d3.scale.linear()
+// 			.domain([-20,20])
+// 			.range([0,100]);
+// var ticks = linear.ticks(5);
+// // console.log(ticks);
+// // var tickFormat = linear.tickFormat(5,"+");
+
+// var  ordinal = d3.scale.ordinal()
+// 			.domain([1,2,3,4,5])
+// 			.rangePoints([0,100]);
+// console.log(ordinal.range());
+// console.log(ordinal(2));
+// console.log(ordinal(3));
+
+// var dataset = [1.2, 2.3, 0.9, 1.5, 3.3];  //现要求将dataset中最小的值映射成0，最大的值映射成300
+// var min = d3.min(dataset);
+// var max = d3.max(dataset);
+
+// // console.log("min:"+min+",max："+max);
+// var linear = d3.scale.linear()             //d3.scale.linear()的返回值，是可以当做函数来使用的。
+// 		.domain([min, max])
+// 		.range([0,300]);
+// // console.log(linear(0.9));  //0
+// // console.log(linear(3.3));   //300
+// // 
+
+/*
+* 序数比例尺
+ */
+// var index = [0, 1, 2, 3, 4];
+// var color = ["red", "blue", "green", "yellow", "black"];
+
+// var ordinal = d3.scale.ordinal()
+// 		.domain(index)
+// 		.range(color);
+
+// console.log(ordinal(4));
+
+/*
+*给柱形图添加比例尺
+ */
+
+var svg = d3.select("#div1").append("svg").attr("width", 400).attr("height",400);
+var dataset = [2.5, 2.1, 1.7, 1.3, 0.9];
+var linear = d3.scale.linear()
+		.domain([0, d3.max(dataset)])
+		.range([0, 250]);
+
+var rectHeight = 25;
+svg.selectAll("rect")
+	.data(dataset)
+	.enter()
+	.append("rect")
+	.attr("x", 20)
+	.attr("y", function(d, i){
+		return i*rectHeight;
+	})
+	.attr("width", function(d){
+		return linear(d);
+	})
+	.attr("height", rectHeight-2)
+	.attr("fill", "steelblue");
+
+</script>
+</body>
+</html>

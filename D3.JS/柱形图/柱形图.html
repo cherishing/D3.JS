@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="d3.js"></script>
+	<style>
+		/* .MyRect{fill:steelblue;} */
+		.MyText{text-anchor:middle; fill:#fff;}
+		.axis{fill:#000; }
+		.axis line, path{fill:none; stroke:black; shape-rendering:crispEdges;}
+	</style>
+</head>
+<body>
+<script>
+/*
+* 完整的柱形图
+ */
+//1.定义画布
+
+var width = 400;
+var height = 400;
+var svg = d3.select("body")					//在body里添加一个svg画布
+		.append("svg")
+		.attr("width", width)
+		.attr("height", height);
+
+var padding = {left:30, right:30, top:20, bottom:20};   	//画布周边的空白
+
+//2、定义数据和比例尺
+var dataset = [10, 20, 30, 40, 33, 24, 12, 5];
+var xScale = d3.scale.ordinal()					//x轴比例尺
+		.domain(d3.range(dataset.length))
+		.rangeRoundBands([0, width-padding.left-padding.right]);
+
+var yScale = d3.scale.linear()
+		.domain([0, d3.max(dataset)])
+		.range([height-padding.top-padding.bottom, 0]);
+//3、定义坐标轴
+var xAxis = d3.svg.axis()		//定义x轴
+		.scale(xScale)
+		.orient("bottom");
+
+var yAxis = d3.svg.axis()		//定义y轴
+		.scale(yScale)
+		.orient("left");
+
+//4、添加矩形和文字元素
+var rectPadding = 4;
+var rects = svg.selectAll(".MyRect")		//添加矩形元素
+		.data(dataset)
+		.enter()
+		.append("rect")
+		.attr("class", "MyRect")
+		.attr("transform", "translate("+padding.left+","+padding.top+")")
+		.attr("x", function(d, i){
+			console.log(xScale(i)+' ,i:'+i+",d:"+d);
+			return xScale(i)+rectPadding/2;
+		})
+		.attr("y", function(d){
+			return yScale(d);
+		})
+		.attr("width", xScale.rangeBand() - rectPadding)
+		.attr("height", function(d){
+			return height-padding.top- padding.bottom-yScale(d);
+		})
+		.attr("fill", "steelblue")
+		.on("mouseover", function(d, i){
+			d3.select(this).attr("fill", "yellow");
+		})
+		.on("mouseout", function(d, i){
+			d3.select(this)
+				.transition()
+				.duration(1000)
+				.attr("fill", "steelblue")
+		});
+
+var texts = svg.selectAll(".MyText")
+		.data(dataset)
+		.enter()
+		.append("text")
+		.attr("class", "MyText")
+		.attr("transform", "translate("+padding.left+","+padding.top+")")
+		.attr("x", function(d, i){
+			// console.log(xScale(i));
+			return xScale(i)+rectPadding/2;
+		})
+		.attr("y", function(d){			//给文字添加动画效果，让文字缓慢升至目标高度，并在目标出跳动几次
+			var min = yScale.domain()[0];	//文字起始状态 文字的位置
+			return yScale(min);
+			// return yScale(d);
+		})
+		.transition()
+		.delay(function(d, i){
+			return i*200;
+		})
+		.duration(2000)
+		.ease("bounce")
+		.attr("y", function(d){			//文字终止状态  文字的最终目标位置
+			return yScale(d);
+		})
+		.attr("dx", function(){
+			return (xScale.rangeBand() - rectPadding)/2;
+		})
+		.attr("dy", function(d){
+			return 20;
+		})
+		.text(function(d){
+			return d;
+		});
+
+//添加坐标轴元素
+svg.append("g")		//添加x轴
+	.attr("class", "axis")
+	.attr("transform", "translate("+padding.left+","+(height-padding.bottom)+")")
+	.call(xAxis);
+
+svg.append("g")
+	.attr("class", "axis")
+	.attr("transform", "translate("+padding.left+","+padding.top+")")
+	.call(yAxis);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+	*{margin:0; padding:0;}
+	</style>
+</head>
+<body>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<script src="d3.js"></script>
+<script>
+var dataset = [3, 6, 9, 12, 15];
+var p = d3.select("body").selectAll("p");
+var updata = p.data(dataset);
+var enter = updata.enter();
+// console.log(enter);
+var exit = updata.exit();
+console.log(exit);
+
+svg.selectAll("rect")		//选择svg内所有的矩形
+	.data(dataset)			//绑定数组
+	.enter()				//指定选择集的enter部分
+	.append("rect");		//添加足够数量的矩形元素
+</script>
+</body>
+</html>
