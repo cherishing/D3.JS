@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="d3.js"></script>
+	<style>
+	*{margin:0; padding:0;}
+	.webs polygon{
+		fill: white;
+		fill-opacity: .5;
+		stroke: gray;
+		stroke-dasharray: 10 5;
+	}
+	</style>
+</head>
+<body>
+
+<script>
+var width = 800;
+var height = 800;
+var svg =d3.select("body").append("svg")
+	.attr("width", width)
+	.attr("height", height);
+
+var main = svg.append("g")
+	.classed("main", true)
+	.attr("transform", "translate("+width/2+","+height/2+")");
+
+function getColor(idx) {
+	var palette = [
+		'#2ec7c9', '#b6a2de', '#5ab1ef', '#ffb980', '#d87a80',
+		'#8d98b3', '#e5cf0d', '#97b552', '#95706d', '#dc69aa',
+		'#07a2a4', '#9a7fd1', '#588dd5', '#f5994e', '#c05050',
+		'#59678c', '#c9ab00', '#7eb00a', '#6f5553', '#c14089'
+	]
+	return palette[idx % palette.length];
+}
+var data = {
+	fieldName : ["语文", "数学", "外语", "物理", "生物", "化学", "政治", "历史"],
+	values:[
+		[10, 20, 30, 40, 50, 60, 70, 80]
+	]
+};
+
+//计算网轴坐标并绘制
+var radius = 100, 
+	total = 8, 
+	level = 4, 
+	rangeMin = 0, 
+	rangeMax = 100,
+	arc = 2*Math.PI;
+var onePiece = arc/total;
+var polygons = {
+	webs:[],
+	webPoints:[]
+};
+for(var k = level; k>0; k--){
+	var webs = "";
+	var webPoints = [];
+	var r = radius/level*k;
+	for(var i = 0;i<total; i++){
+		var x = r*Math.sin(i*onePiece);
+		var y = r*Math.cos(i*onePiece);
+		webs+=x+","+y+"";
+		webPoints.push({
+			x:x,
+			y:y
+		});
+	}
+	polygons.webs.push(webs);
+	polygons.webPoints.push(webPoints);
+}
+var webs = main.append("g")
+	.classed("webs", true);
+webs.selectAll("polygon")
+	.data(polygons.webs)
+	.enter()
+	.append("polygon")
+	.attr("points", function(d){
+		console.log(d);
+		return d;
+	})
+</script>
+</body>
+</html>
